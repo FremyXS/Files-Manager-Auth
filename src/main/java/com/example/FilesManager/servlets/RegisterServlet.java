@@ -2,7 +2,8 @@ package com.example.FilesManager.servlets;
 
 import com.example.FilesManager.models.User;
 import com.example.FilesManager.services.CookieUtil;
-import com.example.FilesManager.services.UserService;
+import com.example.FilesManager.services.DbService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,7 +15,7 @@ public class RegisterServlet  extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (UserService.getUserByCookies(req.getCookies()) != null) {
+        if (DbService.USER_SERVICE.getUserByCookies(req.getCookies()) != null) {
             resp.sendRedirect(req.getContextPath() + "/");
             return;
         }
@@ -27,15 +28,17 @@ public class RegisterServlet  extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
-        if (login == null || UserService.getUserByLogin(login) != null || email == null || password == null) {
-            return;
+        if (login == null
+                || DbService.USER_SERVICE.getUser(login) != null
+                || email == null || password == null) {
+            resp.sendRedirect(req.getContextPath() + "/");
         }
 
-        User user = new User(login, email, password);
-
-        UserService.addUser(user);
-
-        UserService.addSession(CookieUtil.getValue(req.getCookies(), "JSESSIONID"), user);
+        User user = new User(login,  password, email);
+;
+        DbService.USER_SERVICE.addUser(user);
+        CookieUtil.addCookie(resp, "login", login);
+        CookieUtil.addCookie(resp, "password", password);
 
         resp.sendRedirect(req.getContextPath() + "/");
     }
