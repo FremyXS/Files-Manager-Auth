@@ -2,7 +2,7 @@ package com.example.FilesManager.servlets;
 
 import com.example.FilesManager.models.User;
 import com.example.FilesManager.services.CookieUtil;
-import com.example.FilesManager.services.UserService;
+import com.example.FilesManager.services.DbService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +22,7 @@ public class FilesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        User user = UserService.getUserByCookies(req.getCookies());
+        User user = DbService.USER_SERVICE.getUserByCookies(req.getCookies());
 
         if (user == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
@@ -108,7 +108,8 @@ public class FilesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getParameter("exit") != null) {
-            UserService.deleteSession(CookieUtil.getValue(req.getCookies(), "JSESSIONID"));
+            CookieUtil.addCookie(resp, "login", null);
+            CookieUtil.addCookie(resp, "password", null);
             resp.sendRedirect(req.getContextPath() + "/");
         }
     }

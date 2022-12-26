@@ -7,8 +7,10 @@ import org.hibernate.annotations.NaturalId;
 @Table(name = "users")
 public class User {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+    @Column(name = "login", unique = true, updatable = false)
     @NaturalId
     private String login;
     private String pass;
@@ -23,7 +25,7 @@ public class User {
 
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
     public String getLogin() {
